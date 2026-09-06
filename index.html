@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>帅天威 &amp; 沈湘雨的婚礼邀请</title>
+<!-- 微信/QQ 分享卡片 -->
+<meta name="description" content="2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻">
+<meta itemprop="name" content="帅天威 &amp; 沈湘雨的婚礼邀请">
+<meta itemprop="description" content="2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻">
+<meta itemprop="image" content="https://tenviy.github.io/wedding-invite/photos/g3.jpg">
+<meta property="og:type" content="website">
+<meta property="og:title" content="帅天威 &amp; 沈湘雨的婚礼邀请">
+<meta property="og:description" content="2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻">
+<meta property="og:image" content="https://tenviy.github.io/wedding-invite/photos/g3.jpg">
+<meta property="og:url" content="https://tenviy.github.io/wedding-invite/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Zhi+Mang+Xing&family=Special+Elite&family=Great+Vibes&display=swap" rel="stylesheet">
@@ -126,7 +136,9 @@
 
   /* 日历 */
   .calendar{padding:40px 20px 0;text-align:center}
-  .calendar .month-img{width:150px;margin:0 auto;display:block}
+  .calendar .cal-month{margin:0 auto}
+  .calendar .cal-month .en{font-family:"Great Vibes",cursive;color:var(--red);font-size:36px;display:block}
+  .calendar .cal-month .cn{display:block;font-size:13.5px;letter-spacing:.32em;color:var(--ink-soft);margin-top:6px}
   .calendar table{width:100%;border-collapse:collapse;margin-top:26px}
   .calendar th{font-family:Georgia,serif;font-weight:400;color:#9a9a9a;font-size:12.5px;letter-spacing:.06em;padding:8px 0}
   .calendar td{color:var(--tan);font-size:15px;padding:12px 0;font-family:var(--serif)}
@@ -186,6 +198,44 @@
     background:var(--red);color:#fff;font-size:10px;line-height:16px;padding:0 4px;font-family:Georgia,serif;
   }
   .dock .sep{width:1px;align-self:center;height:26px;background:rgba(140,120,90,.22)}
+
+  /* 地图选择抽屉 */
+  .map-sheet{
+    position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;z-index:71;
+    width:100%;max-width:480px;background:var(--paper);border-radius:18px 18px 0 0;
+    padding:20px 22px calc(24px + env(safe-area-inset-bottom));
+    transition:transform .35s cubic-bezier(.2,.8,.25,1);
+  }
+  body.map-open .sheet-mask{opacity:1;pointer-events:auto}
+  body.map-open .map-sheet{transform:translate(-50%,0)}
+  .map-sheet .grab{width:40px;height:4px;border-radius:2px;background:#c8bda6;margin:0 auto 14px}
+  .map-sheet h3{font-size:16px;letter-spacing:.35em;text-align:center;font-weight:600;margin-bottom:16px}
+  .map-opt{
+    display:flex;align-items:center;gap:14px;width:100%;border:none;cursor:pointer;
+    background:rgba(255,255,255,.55);border-radius:12px;padding:15px 16px;margin-bottom:10px;
+    font-family:var(--serif);font-size:15.5px;color:var(--ink);letter-spacing:.08em;text-align:left;
+  }
+  .map-opt:active{background:rgba(179,58,48,.06)}
+  .map-opt .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .map-opt .arrow{margin-left:auto;color:#b0a58e;font-size:18px;font-family:Georgia,serif}
+  .map-opt small{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px;letter-spacing:.05em}
+
+  /* 微信分享引导 */
+  .wx-guide{
+    position:fixed;inset:0;z-index:85;background:rgba(30,25,18,.72);
+    opacity:0;pointer-events:none;transition:opacity .3s;
+  }
+  body.guide-open .wx-guide{opacity:1;pointer-events:auto}
+  .wx-guide .arrow-up{
+    position:absolute;top:8px;right:22px;width:64px;height:74px;
+  }
+  .wx-guide .tip-box{
+    position:absolute;top:88px;right:16px;left:16px;max-width:300px;margin-left:auto;
+    background:var(--paper);border-radius:14px;padding:18px 20px;text-align:center;
+    font-size:14.5px;line-height:2;letter-spacing:.06em;color:var(--ink);
+    box-shadow:0 12px 34px rgba(0,0,0,.28);
+  }
+  .wx-guide .tip-box b{color:var(--red)}
 
   /* 留言抽屉 */
   .sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -267,7 +317,7 @@
   <!-- 音乐卡片 -->
   <div class="music-card reveal" id="music-card">
     <div class="info">
-      <div class="song" data-k="song">我们结婚啦 - 恶作剧之吻</div>
+      <div class="song" data-k="song">为爱奔赴</div>
       <div class="state" id="music-state">点击播放音乐</div>
     </div>
     <div class="eq"><i></i><i></i><i></i><i></i></div>
@@ -396,9 +446,9 @@
 
   <!-- 日历 -->
   <div class="calendar reveal">
-    <img class="month-img" src="photos/september.png" alt="SEPTEMBER" data-img="september">
+    <div class="cal-month" data-k="cal-month"><span class="en">September</span><span class="cn">— 玖月 · 二〇二六 —</span></div>
     <table>
-      <thead><tr><th>MON</th><th>TUE</th><th>WED</th><th>THU</th><th>FRI</th><th>SAT</th><th>SUN</th></tr></thead>
+      <thead><tr><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr></thead>
       <tbody id="cal-body"></tbody>
     </table>
   </div>
@@ -413,7 +463,7 @@
     · 海陵区泰和路与凤凰东路交叉口西北220米
   </div>
   <div class="reveal">
-    <a class="nav-btn" href="https://uri.amap.com/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&city=%E6%B3%B0%E5%B7%9E&src=invite" target="_blank" rel="noopener">导航</a>
+    <a class="nav-btn" id="addr-nav" href="https://uri.amap.com/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&city=%E6%B3%B0%E5%B7%9E&src=invite" rel="noopener">导航</a>
   </div>
 
   <!-- 着装建议 -->
@@ -496,10 +546,39 @@
   <h3>祝福留言</h3>
   <div class="sheet-list" id="sheet-list"></div>
   <form class="sheet-form" id="wish-form">
-    <input type="text" id="wish-name" maxlength="12" placeholder="你的名字" required>
-    <textarea id="wish-text" rows="3" maxlength="120" placeholder="写下对新人的祝福…" required></textarea>
+    <input type="text" id="wish-name" maxlength="12" placeholder="你的名字" required>    <textarea id="wish-text" rows="3" maxlength="120" placeholder="写下对新人的祝福…" required></textarea>
     <button type="submit">送 出 祝 福</button>
   </form>
+</div>
+
+<!-- 地图选择抽屉 -->
+<div class="map-sheet" id="map-sheet">
+  <div class="grab"></div>
+  <h3>选择地图导航</h3>
+  <button class="map-opt" data-map="amap">
+    <span class="dot" style="background:#1e80ff"></span>
+    <span>高德地图<small>金域婚礼庄园（泰州）</small></span>
+    <span class="arrow">›</span>
+  </button>
+  <button class="map-opt" data-map="baidu">
+    <span class="dot" style="background:#306eff"></span>
+    <span>百度地图<small>金域婚礼庄园（泰州）</small></span>
+    <span class="arrow">›</span>
+  </button>
+  <button class="map-opt" data-map="tencent">
+    <span class="dot" style="background:#00b578"></span>
+    <span>腾讯地图<small>金域婚礼庄园（泰州）</small></span>
+    <span class="arrow">›</span>
+  </button>
+</div>
+
+<!-- 微信分享引导 -->
+<div class="wx-guide" id="wx-guide">
+  <svg class="arrow-up" viewBox="0 0 64 74" fill="none" stroke="#f6f2e9" stroke-width="2.5" stroke-linecap="round">
+    <path d="M10 70C14 46 28 30 52 18" stroke-dasharray="1 7"/>
+    <path d="M42 14L54 14L54 26"/>
+  </svg>
+  <div class="tip-box">点击右上角 <b>「 ··· 」</b><br>把这份喜悦 <b>发送给朋友</b> 或 <b>分享到朋友圈</b></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -680,25 +759,53 @@
     }
   });
 
-  /* 导航 */
-  function navURL(){return 'https://uri.amap.com/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&city=%E6%B3%B0%E5%B7%9E&src=invite';}
-  document.getElementById('dock-nav').addEventListener('click',function(){
-    window.open(navURL(),'_blank');
-  });
-  q('.nav-btn').addEventListener('click',function(e){
-    if(document.body.classList.contains('edit')) e.preventDefault();
+  /* 导航：三选一地图 */
+  var MAP_URLS={
+    amap:'https://uri.amap.com/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&city=%E6%B3%B0%E5%B7%9E&src=invite',
+    baidu:'https://api.map.baidu.com/geocoder?address=%E6%B3%B0%E5%B7%9E%E5%B8%82%E6%B5%B7%E9%99%B5%E5%8C%BA%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&output=html&src=hlq.invite',
+    tencent:'https://apis.map.qq.com/uri/v1/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&region=%E6%B3%B0%E5%B7%9E&referer=hlq.invite'
+  };
+  function openMapSheet(){
+    if(document.body.classList.contains('edit')) return;
+    document.body.classList.add('map-open');
+  }
+  function closeMapSheet(){document.body.classList.remove('map-open');}
+  document.getElementById('dock-nav').addEventListener('click',openMapSheet);
+  document.getElementById('addr-nav').addEventListener('click',function(e){ e.preventDefault(); openMapSheet(); });
+  document.getElementById('sheet-mask').addEventListener('click',closeMapSheet);
+  document.querySelectorAll('.map-opt').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      window.open(MAP_URLS[btn.getAttribute('data-map')],'_blank');
+      closeMapSheet();
+    });
   });
 
-  /* 分享 */
+  /* 分享：优先系统分享面板（可选微信），微信内给右上角引导 */
+  var guide=document.getElementById('wx-guide');
+  guide.addEventListener('click',function(){document.body.classList.remove('guide-open');});
   document.getElementById('dock-share').addEventListener('click',function(){
-    var url=location.href;
+    var shareData={
+      title:'帅天威 & 沈湘雨的婚礼邀请',
+      text:'2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻',
+      url:'https://tenviy.github.io/wedding-invite/'
+    };
+    if(navigator.share){
+      navigator.share(shareData).catch(function(){});
+      return;
+    }
+    /* 微信内置浏览器：引导点右上角 */
+    if(/MicroMessenger/i.test(navigator.userAgent)){
+      document.body.classList.add('guide-open');
+      return;
+    }
+    /* 兜底：复制链接 */
     function done(){toast('链接已复制，快分享给好友吧');}
     function fb(){
-      var ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();
+      var ta=document.createElement('textarea');ta.value=shareData.url;document.body.appendChild(ta);ta.select();
       try{document.execCommand('copy');done();}catch(e){toast('请手动复制地址栏链接');}
       ta.remove();
     }
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done).catch(fb);}else fb();
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(shareData.url).then(done).catch(fb);}else fb();
   });
 
   /* ============ 编辑模式 ============ */
