@@ -51,16 +51,10 @@
     text-align:left;padding:30px 30px 0;font-size:19px;font-weight:700;letter-spacing:.08em;
   }
 
-  /* 照片柔边：宽羽化，照片如晕染般消融进纸纹 */
+  /* 照片柔边：椭圆晕染式消融，无框感，如水彩洇进纸纹 */
   .photo,.pair img,.collage img{
-    -webkit-mask-image:
-      linear-gradient(to right,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent),
-      linear-gradient(to bottom,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent);
-    -webkit-mask-composite:source-in;
-    mask-image:
-      linear-gradient(to right,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent),
-      linear-gradient(to bottom,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent);
-    mask-composite:intersect;
+    -webkit-mask-image:radial-gradient(ellipse 84% 80% at 50% 50%,#000 55%,rgba(0,0,0,.62) 72%,rgba(0,0,0,.25) 85%,transparent 97%);
+    mask-image:radial-gradient(ellipse 84% 80% at 50% 50%,#000 55%,rgba(0,0,0,.62) 72%,rgba(0,0,0,.25) 85%,transparent 97%);
   }
 
   /* 封面 */
@@ -446,7 +440,7 @@
 
   <!-- 日历 -->
   <div class="calendar reveal">
-    <div class="cal-month" data-k="cal-month"><span class="en">September</span><span class="cn">— 玖月 · 二〇二六 —</span></div>
+    <div class="cal-month" data-k="cal-month"><span class="en">September</span><span class="cn">— 二〇二六 · 玖月 —</span></div>
     <table>
       <thead><tr><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr></thead>
       <tbody id="cal-body"></tbody>
