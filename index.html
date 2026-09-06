@@ -41,16 +41,15 @@
     text-align:left;padding:30px 30px 0;font-size:19px;font-weight:700;letter-spacing:.08em;
   }
 
-  /* 照片柔边：四角圆润 + 边缘羽化过渡进纸纹 */
+  /* 照片柔边：宽羽化，照片如晕染般消融进纸纹 */
   .photo,.pair img,.collage img{
-    border-radius:16px;
     -webkit-mask-image:
-      linear-gradient(to right,transparent,#000 13px,#000 calc(100% - 13px),transparent),
-      linear-gradient(to bottom,transparent,#000 13px,#000 calc(100% - 13px),transparent);
+      linear-gradient(to right,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent),
+      linear-gradient(to bottom,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent);
     -webkit-mask-composite:source-in;
     mask-image:
-      linear-gradient(to right,transparent,#000 13px,#000 calc(100% - 13px),transparent),
-      linear-gradient(to bottom,transparent,#000 13px,#000 calc(100% - 13px),transparent);
+      linear-gradient(to right,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent),
+      linear-gradient(to bottom,transparent,rgba(0,0,0,.55) 14px,#000 34px,#000 calc(100% - 34px),rgba(0,0,0,.55) calc(100% - 14px),transparent);
     mask-composite:intersect;
   }
 
@@ -162,30 +161,31 @@
   .wish .txt{font-size:14.5px;line-height:1.9}
   .wish-empty{text-align:center;font-size:13.5px;color:var(--ink-soft);padding:14px 0}
 
-  /* 底部悬浮功能栏：纸质胶囊，贴合主体 */
+  /* 底部悬浮功能栏：与主体同宽同纸纹，一体贴合 */
   .dock{
     position:fixed;left:50%;transform:translateX(-50%);
-    bottom:calc(14px + env(safe-area-inset-bottom));
-    z-index:60;display:flex;align-items:center;gap:2px;
-    background:rgba(250,247,240,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    border:1px solid rgba(140,120,90,.3);
-    border-radius:999px;padding:7px 12px;
-    box-shadow:0 10px 30px rgba(100,80,50,.2),inset 0 1px 0 rgba(255,255,255,.7);
-    max-width:calc(100vw - 24px);
+    bottom:calc(10px + env(safe-area-inset-bottom));
+    z-index:60;display:flex;align-items:stretch;
+    width:366px;max-width:calc(100vw - 24px);
+    background:#f6f2e9 url("photos/bg.png") repeat-y center top;background-size:390px auto;
+    border:1px solid rgba(140,120,90,.35);
+    border-radius:20px;padding:9px 6px;
+    box-shadow:0 8px 26px rgba(100,80,50,.22),0 1px 4px rgba(100,80,50,.12),inset 0 1px 0 rgba(255,255,255,.65);
   }
   .dock button{
-    appearance:none;border:none;background:transparent;cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;gap:3px;
-    color:#6b6152;font-family:var(--serif);font-size:10.5px;letter-spacing:.12em;
-    padding:6px 13px;border-radius:999px;position:relative;white-space:nowrap;
+    appearance:none;border:none;background:transparent;cursor:pointer;flex:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    color:#6b6152;font-family:var(--serif);font-size:11px;letter-spacing:.15em;
+    padding:7px 0;border-radius:14px;position:relative;white-space:nowrap;
+    transition:color .2s,background .2s;
   }
-  .dock button:active{color:var(--red);background:rgba(179,58,48,.08)}
-  .dock button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .dock button:active{color:var(--red);background:rgba(179,58,48,.07)}
+  .dock button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
   .dock .badge{
-    position:absolute;top:1px;right:6px;min-width:16px;height:16px;border-radius:8px;
+    position:absolute;top:0;right:50%;transform:translateX(22px);min-width:16px;height:16px;border-radius:8px;
     background:var(--red);color:#fff;font-size:10px;line-height:16px;padding:0 4px;font-family:Georgia,serif;
   }
-  .dock .sep{width:1px;height:24px;background:rgba(140,120,90,.25)}
+  .dock .sep{width:1px;align-self:center;height:26px;background:rgba(140,120,90,.22)}
 
   /* 留言抽屉 */
   .sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
