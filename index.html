@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>帅天威 &amp; 沈湘雨的婚礼邀请</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Zhi+Mang+Xing&family=Special+Elite&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f2e9;
+    --ink:#333333;
+    --ink-soft:#8c857a;
+    --red:#b33a30;
+    --tan:#c9a96a;
+    --serif:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+    --hand:"Zhi Mang Xing","Noto Serif SC",cursive;
+    --type:"Special Elite","Courier New",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:var(--serif);
+    color:var(--ink);
+    background:#f6f2e9 url("photos/bg.png") repeat-y center top;
+    background-size:100% auto;
+  }
+  .page{
+    width:390px;margin:0 auto;min-height:100vh;
+    padding-bottom:130px;
+    overflow:hidden;
+    transform-origin:top center;
+  }
+  img{display:block}
+  .photo{width:100%}
+  .photo-margined{width:calc(100% - 56px);margin:0 28px}
+  .text-block{padding:34px 30px;text-align:center;font-size:15.5px;line-height:2.3;letter-spacing:.05em}
+  .text-block.left{text-align:left;line-height:2.2}
+  .hand{font-family:var(--hand);font-weight:400}
+  .story-title{
+    text-align:left;padding:30px 30px 0;font-size:19px;font-weight:700;letter-spacing:.08em;
+  }
+
+  /* 照片柔边：四角圆润 + 边缘羽化过渡进纸纹 */
+  .photo,.pair img,.collage img{
+    border-radius:16px;
+    -webkit-mask-image:
+      linear-gradient(to right,transparent,#000 13px,#000 calc(100% - 13px),transparent),
+      linear-gradient(to bottom,transparent,#000 13px,#000 calc(100% - 13px),transparent);
+    -webkit-mask-composite:source-in;
+    mask-image:
+      linear-gradient(to right,transparent,#000 13px,#000 calc(100% - 13px),transparent),
+      linear-gradient(to bottom,transparent,#000 13px,#000 calc(100% - 13px),transparent);
+    mask-composite:intersect;
+  }
+
+  /* 封面 */
+  .cover-head{padding:36px 24px 0;text-align:center}
+  .cover-en{font-size:20px;font-weight:700;color:var(--red);letter-spacing:.18em;white-space:nowrap}
+  .cover-script{font-family:"Great Vibes",cursive;color:var(--red);font-size:36px;margin-top:14px}
+  .cover-invite{margin-top:24px;font-size:15.5px;line-height:2.4;letter-spacing:.08em}
+  .cover-top{padding:26px 20px 0}
+  .cover-names2{text-align:center;font-size:19px;font-weight:600;letter-spacing:.18em;margin-top:24px}
+  .cover-names2 i{font-style:normal;color:var(--red);margin:0 6px}
+
+  /* 音乐卡片 */
+  .music-card{
+    margin:30px 22px 0;background:rgba(236,236,236,.85);border-radius:12px;
+    display:flex;align-items:center;padding:16px 18px;gap:12px;cursor:pointer;
+  }
+  .music-card .info{flex:1;text-align:left;min-width:0}
+  .music-card .song{font-size:15.5px;font-weight:700;letter-spacing:.03em}
+  .music-card .state{font-size:12px;color:#9a9a9a;margin-top:6px;letter-spacing:.05em}
+  .music-card .eq{display:flex;align-items:flex-end;gap:2.5px;height:22px}
+  .music-card .eq i{width:3.5px;background:#333;border-radius:2px}
+  .music-card .eq i:nth-child(1){height:35%}.music-card .eq i:nth-child(2){height:75%}
+  .music-card .eq i:nth-child(3){height:100%}.music-card .eq i:nth-child(4){height:55%}
+  .music-card.playing .eq i{animation:eq .9s infinite ease-in-out alternate}
+  .music-card.playing .eq i:nth-child(2){animation-delay:.2s}
+  .music-card.playing .eq i:nth-child(3){animation-delay:.35s}
+  .music-card.playing .eq i:nth-child(4){animation-delay:.5s}
+  @keyframes eq{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+  .music-card .album{width:52px;height:52px;border-radius:8px;object-fit:cover;flex:none}
+
+  /* 顶部音乐按钮 */
+  .music-fab{
+    position:fixed;top:14px;right:14px;z-index:55;
+    width:38px;height:38px;border:none;background:transparent;cursor:pointer;padding:4px;
+  }
+  .music-fab svg{width:100%;height:100%;stroke:#333;fill:none;stroke-width:1.5}
+  .music-fab.spin svg{animation:spin 4s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* 新人 */
+  .couple{display:flex;justify-content:center;align-items:center;gap:26px;padding:10px 30px 0}
+  .couple .person{text-align:center}
+  .couple .person img{width:132px;height:132px;border-radius:50%;object-fit:cover;box-shadow:0 6px 22px rgba(100,80,50,.16)}
+  .couple .role{color:var(--red);font-size:15px;font-style:italic;margin-top:14px;font-family:Georgia,serif}
+  .couple .pname{font-size:17px;font-weight:600;letter-spacing:.3em;margin-top:4px;text-indent:.3em}
+  .couple .xi{font-size:34px;color:var(--red);font-weight:700;line-height:1;padding-bottom:60px}
+
+  /* 手写章节标题 */
+  .hand-section{text-align:center;font-size:30px;padding:44px 0 6px;letter-spacing:.1em}
+
+  /* 故事照片排版 */
+  .pair{display:flex;gap:10px;padding:0 14px;align-items:flex-start}
+  .pair img{width:50%}
+  .pair img:nth-child(2){margin-top:34px}
+  .collage{display:flex;gap:10px;padding:0 14px;align-items:stretch}
+  .collage .l{width:47%}
+  .collage .r{width:53%;object-fit:cover}
+
+  /* WEDDING TIME */
+  .sec-head{padding:44px 30px 0;text-align:left}
+  .sec-head .en{font-size:24px;font-weight:700;color:var(--red);letter-spacing:.18em}
+  .sec-head .cn{font-size:17px;font-weight:600;margin-top:6px;letter-spacing:.2em}
+  .time-lines{padding:16px 30px 0;text-align:left;font-size:16.5px;line-height:2.2;letter-spacing:.06em}
+
+  /* 流程 */
+  .schedule{padding:26px 30px 0}
+  .schedule .row{display:flex;align-items:center;gap:10px;padding:10px 0}
+  .schedule .lab{flex:none;width:70px;font-size:15.5px;font-weight:600;text-align:left}
+  .schedule .ico-img{flex:none;width:34px;height:auto;object-fit:contain}
+  .schedule .dots{flex:1;border-bottom:2px dotted #999;margin:0 2px;transform:translateY(-4px)}
+  .schedule .desc{flex:none;font-size:15px;text-align:left;white-space:nowrap}
+  .schedule .desc b{font-family:Georgia,serif;margin-right:2px}
+
+  /* 日历 */
+  .calendar{padding:40px 20px 0;text-align:center}
+  .calendar .month-img{width:150px;margin:0 auto;display:block}
+  .calendar table{width:100%;border-collapse:collapse;margin-top:26px}
+  .calendar th{font-family:Georgia,serif;font-weight:400;color:#9a9a9a;font-size:12.5px;letter-spacing:.06em;padding:8px 0}
+  .calendar td{color:var(--tan);font-size:15px;padding:12px 0;font-family:var(--serif)}
+  .calendar td .heart{
+    display:inline-flex;align-items:center;justify-content:center;position:relative;
+    width:36px;height:32px;
+  }
+  .calendar td .heart svg{position:absolute;inset:0;width:100%;height:100%;fill:var(--red)}
+  .calendar td .heart b{position:relative;color:#fff;font-weight:600;font-size:14px;padding-bottom:3px}
+
+  /* 地址 */
+  .addr-lines{padding:18px 30px 0;text-align:left;font-size:15.5px;line-height:2.3}
+  .nav-btn{
+    display:inline-block;margin:20px 30px 0;background:#e0301e;color:#fff;
+    font-size:14px;font-weight:600;letter-spacing:.2em;padding:9px 26px;border-radius:8px;
+    text-decoration:none;border:none;cursor:pointer;font-family:var(--serif);
+  }
+
+  /* 着装 */
+  .dress-line{padding:20px 30px 0;text-align:left;font-size:17px;font-weight:600;letter-spacing:.1em}
+  .dress-line .dc{color:var(--red);font-size:13px;font-style:italic;font-weight:400;margin-left:8px;font-family:Georgia,serif}
+  .dress-line .sep{color:#999;margin:0 12px;font-weight:400}
+  .swatch-row{text-align:center;padding:20px 0 0;font-size:15.5px;letter-spacing:.2em}
+  .swatch-row .dots{display:inline-flex;gap:12px;margin-left:14px;vertical-align:middle}
+  .swatch-row .dots i{width:15px;height:15px;border-radius:50%;display:inline-block}
+
+  /* 抽屉内留言条目 */
+  .wish{
+    background:rgba(255,255,255,.55);border-radius:10px;padding:14px 18px;margin-bottom:12px;text-align:left;
+  }
+  .wish .who{font-size:13px;color:var(--red);letter-spacing:.1em;margin-bottom:4px;font-weight:600}
+  .wish .txt{font-size:14.5px;line-height:1.9}
+  .wish-empty{text-align:center;font-size:13.5px;color:var(--ink-soft);padding:14px 0}
+
+  /* 底部悬浮功能栏：纸质胶囊，贴合主体 */
+  .dock{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:calc(14px + env(safe-area-inset-bottom));
+    z-index:60;display:flex;align-items:center;gap:2px;
+    background:rgba(250,247,240,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(140,120,90,.3);
+    border-radius:999px;padding:7px 12px;
+    box-shadow:0 10px 30px rgba(100,80,50,.2),inset 0 1px 0 rgba(255,255,255,.7);
+    max-width:calc(100vw - 24px);
+  }
+  .dock button{
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:#6b6152;font-family:var(--serif);font-size:10.5px;letter-spacing:.12em;
+    padding:6px 13px;border-radius:999px;position:relative;white-space:nowrap;
+  }
+  .dock button:active{color:var(--red);background:rgba(179,58,48,.08)}
+  .dock button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .dock .badge{
+    position:absolute;top:1px;right:6px;min-width:16px;height:16px;border-radius:8px;
+    background:var(--red);color:#fff;font-size:10px;line-height:16px;padding:0 4px;font-family:Georgia,serif;
+  }
+  .dock .sep{width:1px;height:24px;background:rgba(140,120,90,.25)}
+
+  /* 留言抽屉 */
+  .sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+  .sheet{
+    position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;z-index:71;
+    width:100%;max-width:480px;background:var(--paper);border-radius:18px 18px 0 0;
+    padding:20px 22px calc(20px + env(safe-area-inset-bottom));
+    transition:transform .35s cubic-bezier(.2,.8,.25,1);max-height:80vh;display:flex;flex-direction:column;
+  }
+  body.sheet-open .sheet-mask{opacity:1;pointer-events:auto}
+  body.sheet-open .sheet{transform:translate(-50%,0)}
+  .sheet .grab{width:40px;height:4px;border-radius:2px;background:#c8bda6;margin:0 auto 14px}
+  .sheet h3{font-size:16px;letter-spacing:.35em;text-align:center;font-weight:600}
+  .sheet-list{overflow-y:auto;margin:16px 0;flex:1;min-height:110px}
+  .sheet-form{display:flex;flex-direction:column;gap:10px}
+  .sheet-form input,.sheet-form textarea{
+    width:100%;border:1px solid #d6cbb4;background:rgba(255,255,255,.6);border-radius:10px;
+    padding:11px 14px;font-family:var(--serif);font-size:14px;color:var(--ink);resize:none;
+  }
+  .sheet-form input:focus,.sheet-form textarea:focus{outline:none;border-color:var(--red)}
+  .sheet-form button{
+    border:none;background:var(--red);color:#fff;border-radius:10px;
+    padding:12px;font-family:var(--serif);font-size:14px;letter-spacing:.4em;cursor:pointer;
+  }
+  .toast{
+    position:fixed;left:50%;bottom:106px;transform:translateX(-50%) translateY(16px);
+    background:rgba(51,51,51,.92);color:#f6f2e9;padding:10px 22px;border-radius:999px;
+    font-size:13px;letter-spacing:.1em;z-index:80;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .heart-fly{position:fixed;z-index:90;pointer-events:none;font-size:17px;color:var(--red);animation:fly 1s ease-out forwards}
+  @keyframes fly{0%{opacity:1;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-90px) translateX(var(--dx,0)) scale(1.3)}}
+
+  .reveal{opacity:1}
+
+  /* 编辑模式 */
+  .edit-gear{
+    position:fixed;top:14px;left:14px;z-index:65;width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(140,120,90,.3);background:rgba(250,247,240,.92);color:#6b6152;
+    font-size:17px;cursor:pointer;display:none;align-items:center;justify-content:center;
+    box-shadow:0 4px 14px rgba(100,80,50,.15);font-family:var(--serif);padding:0;
+  }
+  .edit-bar{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:calc(70px + env(safe-area-inset-bottom));z-index:66;
+    display:none;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
+    background:rgba(51,51,51,.93);color:#f6f2e9;border-radius:16px;
+    padding:9px 14px;font-size:12px;max-width:calc(100vw - 20px);letter-spacing:.05em;
+  }
+  .edit-bar .tip{width:100%;text-align:center;color:#d8cfbc}
+  .edit-bar select,.edit-bar button{
+    font-family:var(--serif);font-size:12px;border-radius:999px;
+    border:1px solid rgba(246,242,233,.4);background:transparent;color:#f6f2e9;
+    padding:5px 12px;cursor:pointer;letter-spacing:.05em;
+  }
+  .edit-bar select option{color:#333}
+  .edit-bar button:active{background:rgba(255,255,255,.15)}
+  body.edit .edit-gear{background:var(--red);color:#fff;border-color:var(--red)}
+  body.edit .edit-bar{display:flex}
+  body.edit [data-k]{outline:1.5px dashed rgba(179,58,48,.55);outline-offset:3px;cursor:text;min-height:1em}
+  body.edit img[data-img]{cursor:pointer;outline:1.5px dashed rgba(70,110,160,.55);outline-offset:-1px}
+  body.edit .page>div{cursor:grab;touch-action:none}
+  body.edit .page>div:active{cursor:grabbing}
+  body.edit .music-card,body.edit .nav-btn{pointer-events:auto}
+</style>
+</head>
+<body>
+<div class="page" id="stage">
+
+  <!-- 封面 -->
+  <div class="cover-head reveal">
+    <div class="cover-en" data-k="cover-en">WEDDING INVITATION</div>
+    <div class="cover-script" data-k="cover-script">Welcome to our wedding</div>
+    <div class="cover-invite" data-k="cover-invite">邀请收到请柬的每一个你<br>来赴一场【以爱之名】的邀约</div>
+  </div>
+  <div class="cover-top reveal"><img class="photo" src="photos/g3.jpg" alt="婚纱照" data-img="cover"></div>
+  <div class="cover-names2 reveal" data-k="names">帅天威<i>&amp;</i>沈湘雨</div>
+
+  <!-- 音乐卡片 -->
+  <div class="music-card reveal" id="music-card">
+    <div class="info">
+      <div class="song" data-k="song">我们结婚啦 - 恶作剧之吻</div>
+      <div class="state" id="music-state">点击播放音乐</div>
+    </div>
+    <div class="eq"><i></i><i></i><i></i><i></i></div>
+    <img class="album" src="photos/album.jpg" alt="专辑封面" data-img="album">
+  </div>
+  <audio id="bgm" src="music.mp3" loop preload="none"></audio>
+
+  <div class="reveal" style="margin-top:26px"><img class="photo" src="photos/g2.jpg" alt="婚纱照" data-img="g2"></div>
+
+  <!-- 邀请语 -->
+  <div class="text-block reveal" data-k="intro1">
+    婚礼对我们而言是顺其自然的发生<br>
+    我们希望它温馨质朴<br>
+    就如我们的生活，不匆忙，慢慢来
+  </div>
+
+  <!-- 新郎新娘 -->
+  <div class="couple reveal">
+    <div class="person">
+      <img src="photos/groom.jpg" alt="新郎" data-img="groom">
+      <div class="role" data-k="role-g">/ Groom /</div>
+      <div class="pname" data-k="name-g">帅天威</div>
+    </div>
+    <div class="xi" data-k="xi">囍</div>
+    <div class="person">
+      <img src="photos/bride.jpg" alt="新娘" data-img="bride">
+      <div class="role" data-k="role-b">/ Bride /</div>
+      <div class="pname" data-k="name-b">沈湘雨</div>
+    </div>
+  </div>
+
+  <div class="text-block reveal" data-k="story-lines">
+    世间的相遇有千万种<br>
+    我们的故事，是最幸运的那一种<br>
+    从前觉得“一辈子”很远<br>
+    直到遇见彼此<br>
+    现在，我们准备好开启人生的新篇章啦
+  </div>
+
+  <div class="reveal"><img class="photo photo-margined" src="photos/g5.jpg" alt="婚纱照" data-img="g5"></div>
+
+  <div class="text-block reveal" data-k="quote1">
+    我们曾踏遍四季，看过朝夕<br>
+    终于等到把“我”变成“我们”的这一天
+  </div>
+
+  <div class="hand-section hand reveal" data-k="about-title">【关于我们】</div>
+
+  <!-- 求婚 -->
+  <div class="story-title reveal" data-k="t-propose">『2026.12.24·求婚』</div>
+  <div class="text-block left reveal" data-k="tx-propose">
+    被求婚啦<br>
+    他单膝跪地，我笑着说“我愿意”<br>
+    点头的那一刻，眼泪比笑容先到<br>
+    原来被人郑重以待，是这么幸福的事
+  </div>
+  <div class="pair reveal">
+    <img src="photos/g6.jpg" alt="求婚" data-img="g6">
+    <img src="photos/story-propose.jpg" alt="求婚" data-img="story-propose">
+  </div>
+
+  <!-- 订婚 -->
+  <div class="story-title reveal" data-k="t-engage">『2026.01.06·订婚』</div>
+  <div class="text-block left reveal" data-k="tx-engage">
+    在众人的祝福里定下余生<br>
+    以爱之名，共赴朝夕<br>
+    我的余生，有了正式开篇
+  </div>
+  <div class="collage reveal">
+    <img class="l" src="photos/story-engage.jpg" alt="订婚" data-img="story-engage">
+    <img class="r" src="photos/g1.jpg" alt="订婚" data-img="g1">
+  </div>
+
+  <!-- 领证 -->
+  <div class="story-title reveal" data-k="t-license">『2026.08.19·领证』</div>
+  <div class="text-block left reveal" data-k="tx-license">
+    从相遇、相爱到领证，没有惊天动地，却满是心安<br>
+    按下手印的那一刻，心跳快了半拍<br>
+    从此，“我们”有了法律认证<br>
+    往后风雨同舟，甘苦与共
+  </div>
+  <div class="reveal"><img class="photo photo-margined" src="photos/story-license.jpg" alt="领证" data-img="story-license"></div>
+
+  <div class="text-block reveal" data-k="poem">
+    从遇见你的那天起，我就知道<br>
+    你是我人生故事里最想续写的篇章<br>
+    和你在一起的每一刻<br>
+    无论是清晨的粥香，还是深夜的畅谈<br>
+    都让我明白‘家’不是一个地方<br>
+    而是有你的方向
+  </div>
+
+  <div class="reveal"><img class="photo" src="photos/hero.jpg" alt="婚纱照" data-img="hero"></div>
+
+  <!-- 婚礼时间 -->
+  <div class="sec-head reveal">
+    <div class="en" data-k="time-en">WEDDING TIME</div>
+    <div class="cn" data-k="time-cn">婚礼时间</div>
+  </div>
+  <div class="time-lines reveal" data-k="time-lines">
+    · 2026/09.19&ensp;▏农历八月初九<br>
+    · 星期六&ensp;▏18时00分
+  </div>
+
+  <!-- 流程 -->
+  <div class="schedule reveal">
+    <div class="row">
+      <span class="lab" data-k="lab1">宾客到场</span>
+      <img class="ico-img" src="photos/icon-arrive.png" alt="" data-img="icon-arrive">
+      <span class="dots"></span>
+      <span class="desc" data-k="d1"><b>18:00PM</b>见面是快乐的偏方</span>
+    </div>
+    <div class="row">
+      <span class="lab" data-k="lab2">婚礼仪式</span>
+      <img class="ico-img" src="photos/icon-ceremony.png" alt="" data-img="icon-ceremony">
+      <span class="dots"></span>
+      <span class="desc" data-k="d2"><b>18:30PM</b>好兄弟拜把子仪式</span>
+    </div>
+    <div class="row">
+      <span class="lab" data-k="lab3">婚礼晚宴</span>
+      <img class="ico-img" src="photos/icon-dinner.png" alt="" data-img="icon-dinner">
+      <span class="dots"></span>
+      <span class="desc" data-k="d3"><b>19:00PM</b>撸起袖子加油搂席</span>
+    </div>
+  </div>
+
+  <!-- 日历 -->
+  <div class="calendar reveal">
+    <img class="month-img" src="photos/september.png" alt="SEPTEMBER" data-img="september">
+    <table>
+      <thead><tr><th>MON</th><th>TUE</th><th>WED</th><th>THU</th><th>FRI</th><th>SAT</th><th>SUN</th></tr></thead>
+      <tbody id="cal-body"></tbody>
+    </table>
+  </div>
+
+  <!-- 婚礼地址 -->
+  <div class="sec-head reveal">
+    <div class="en" data-k="addr-en">WEDDING ADDRESS</div>
+    <div class="cn" data-k="addr-cn">婚礼地址</div>
+  </div>
+  <div class="addr-lines reveal" data-k="addr-lines">
+    · 金域婚礼庄园（维景酒店北侧）<br>
+    · 海陵区泰和路与凤凰东路交叉口西北220米
+  </div>
+  <div class="reveal">
+    <a class="nav-btn" href="https://uri.amap.com/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&city=%E6%B3%B0%E5%B7%9E&src=invite" target="_blank" rel="noopener">导航</a>
+  </div>
+
+  <!-- 着装建议 -->
+  <div class="dress-line reveal" style="padding-top:44px" data-k="dress">
+    着装建议<span class="dc">Dress code</span><span class="sep">▏</span>低饱和上衣/裙子
+  </div>
+  <div class="swatch-row reveal" data-k="swatch">
+    色系参考
+    <span class="dots">
+      <i style="background:#5a5a54"></i><i style="background:#e8e4d2"></i><i style="background:#a8b0a0"></i><i style="background:#c2b991"></i><i style="background:#8e948e"></i>
+    </span>
+  </div>
+
+  <!-- 感谢 -->
+  <div class="reveal" style="margin-top:40px"><img class="photo photo-margined" src="photos/thanks.jpg" alt="感谢" data-img="thanks"></div>
+  <div class="text-block reveal" data-k="thanks-lines">
+    感谢我的朋友可以看到这里<br>
+    看完我的碎碎念<br>
+    收到这封邀请函的你们<br>
+    都是我们人生中重要的部分<br>
+    如果你有时间<br>
+    请带上最开心的自己来参加我们的婚礼<br>
+    期待我们人生的重要时刻<br>
+    有你们的参与！
+  </div>
+  <div class="text-block reveal" style="padding-top:24px" data-k="final">祝有爱者自由，独立者更自由</div>
+
+</div>
+
+<!-- 顶部音乐开关 -->
+<button class="music-fab" id="music-fab" aria-label="音乐开关">
+  <svg viewBox="0 0 24 24"><path d="M9 18.2V6.5L20 4v11.7"/><circle cx="6.8" cy="18.2" r="2.6"/><circle cx="17.8" cy="15.7" r="2.6"/></svg>
+</button>
+
+<!-- 编辑入口（本地或网址带 ?edit=1 时显示） -->
+<button class="edit-gear" id="edit-gear" title="编辑页面">✎</button>
+<div class="edit-bar" id="edit-bar">
+  <span class="tip">编辑模式：点文字直接改 · 点图片换图 · 按住版块拖动位置 · 改动自动保存</span>
+  <select id="font-sel" title="更换字体">
+    <option value="">字体：宋体（默认）</option>
+    <option value="kai">楷体</option>
+    <option value="hei">黑体</option>
+    <option value="yuan">圆体</option>
+  </select>
+  <button id="edit-export">导出成品</button>
+  <button id="edit-reset">恢复默认</button>
+  <button id="edit-done">完成</button>
+</div>
+<input type="file" id="img-picker" accept="image/*" hidden>
+
+<!-- 底部悬浮功能栏 -->
+<nav class="dock">
+  <button id="dock-wish">
+    <svg viewBox="0 0 24 22"><path d="M2 3H22V14H13L7 20V14H2Z"/></svg>
+    留言
+    <span class="badge" id="wish-count" hidden>0</span>
+  </button>
+  <span class="sep"></span>
+  <button id="dock-like">
+    <svg viewBox="0 0 24 22"><path d="M12 20C12 20 2 13.5 2 7.5C2 4.4 4.4 2 7.5 2C9.4 2 11.1 3 12 4.5C12.9 3 14.6 2 16.5 2C19.6 2 22 4.4 22 7.5C22 13.5 12 20 12 20Z"/></svg>
+    点赞
+    <span class="badge" id="like-count" hidden>0</span>
+  </button>
+  <span class="sep"></span>
+  <button id="dock-nav">
+    <svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9"/><path d="M14.5 7.5L12.5 12.5L7.5 14.5L9.5 9.5Z"/></svg>
+    导航
+  </button>
+  <span class="sep"></span>
+  <button id="dock-share">
+    <svg viewBox="0 0 22 22"><circle cx="6" cy="11" r="2.5"/><circle cx="16" cy="5" r="2.5"/><circle cx="16" cy="17" r="2.5"/><path d="M8.2 9.8L13.8 6.2M8.2 12.2L13.8 15.8"/></svg>
+    分享
+  </button>
+</nav>
+
+<!-- 留言抽屉 -->
+<div class="sheet-mask" id="sheet-mask"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <h3>祝福留言</h3>
+  <div class="sheet-list" id="sheet-list"></div>
+  <form class="sheet-form" id="wish-form">
+    <input type="text" id="wish-name" maxlength="12" placeholder="你的名字" required>
+    <textarea id="wish-text" rows="3" maxlength="120" placeholder="写下对新人的祝福…" required></textarea>
+    <button type="submit">送 出 祝 福</button>
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ 自定义内容（文字/图片/位置/字体） ============ */
+  var CUST_KEY='hlq_cust_v1';
+  var cust=(function(){try{return JSON.parse(localStorage.getItem(CUST_KEY))||{};}catch(e){return{};}})();
+  cust.texts=cust.texts||{}; cust.imgs=cust.imgs||{}; cust.pos=cust.pos||{};
+  function saveCust(){
+    try{localStorage.setItem(CUST_KEY,JSON.stringify(cust));}
+    catch(e){ toast('图片过大，存储空间不足，请换小一点的图'); }
+  }
+  function q(sel){return document.querySelector(sel);}
+
+  /* 应用已保存的自定义内容 */
+  Object.keys(cust.texts).forEach(function(k){
+    var el=q('[data-k="'+k+'"]'); if(el) el.innerHTML=cust.texts[k];
+  });
+  Object.keys(cust.imgs).forEach(function(k){
+    var el=q('[data-img="'+k+'"]'); if(el) el.src=cust.imgs[k];
+  });
+  var blocks=[].slice.call(q('#stage').children);
+  blocks.forEach(function(el,i){
+    el.dataset.b=i;
+    var p=cust.pos[i];
+    if(p&&(p.x||p.y)) el.style.transform='translate('+p.x+'px,'+p.y+'px)';
+  });
+
+  /* 字体 */
+  var FONTS={
+    kai:'"Kaiti SC","STKaiti","KaiTi",serif',
+    hei:'"PingFang SC","Microsoft YaHei",sans-serif',
+    yuan:'"Yuanti SC","YouYuan","Arial Rounded MT Bold",sans-serif'
+  };
+  function applyFont(){
+    if(cust.font&&FONTS[cust.font]) document.documentElement.style.setProperty('--serif',FONTS[cust.font]);
+    else document.documentElement.style.removeProperty('--serif');
+    q('#font-sel').value=cust.font||'';
+  }
+
+  /* 日历 */
+  (function(){
+    var tbody=document.getElementById('cal-body');
+    var first=new Date(2026,8,1).getDay();
+    var offset=(first+6)%7;
+    var html='<tr>',i;
+    for(i=0;i<offset;i++) html+='<td></td>';
+    for(var d=1;d<=30;d++){
+      if((offset+d-1)%7===0&&d>1) html+='</tr><tr>';
+      if(d===19){
+        html+='<td><span class="heart"><svg viewBox="0 0 36 32"><path d="M18 30C18 30 2 20 2 10.5C2 5.5 6 2 10.5 2C13.5 2 16.3 3.8 18 6.5C19.7 3.8 22.5 2 25.5 2C30 2 34 5.5 34 10.5C34 20 18 30 18 30Z"/></svg><b>19</b></span></td>';
+      }else{
+        html+='<td>'+d+'</td>';
+      }
+    }
+    html+='</tr>';
+    tbody.innerHTML=html;
+  })();
+
+  /* 音乐 */
+  var bgm=document.getElementById('bgm');
+  var card=document.getElementById('music-card');
+  var fab=document.getElementById('music-fab');
+  var state=document.getElementById('music-state');
+  var hasMusic=true, playing=false, userPaused=false;
+  bgm.addEventListener('error',function(){ hasMusic=false; state.textContent='点击播放音乐'; });
+  /* 主动探测 music.mp3 是否存在（preload=none 时 error 事件未必触发） */
+  fetch('music.mp3',{method:'HEAD'}).then(function(r){
+    if(!r.ok){ hasMusic=false; return; }
+    /* 有音乐文件：进页面默认自动播放；被浏览器拦截则在首次触摸/点击时自动开始 */
+    bgm.play().then(function(){ setPlaying(true); }).catch(function(){
+      document.addEventListener('touchstart',kick);
+      document.addEventListener('click',kick);
+    });
+  }).catch(function(){ hasMusic=false; });
+  function kick(e){
+    if(playing||!hasMusic||userPaused) return;
+    if(document.body.classList.contains('edit')) return;
+    if(e && e.target && e.target.closest && e.target.closest('#music-card,#music-fab')) return;
+    bgm.play().then(function(){ setPlaying(true); }).catch(function(){});
+  }
+  function setPlaying(p){
+    playing=p;
+    card.classList.toggle('playing',p);
+    fab.classList.toggle('spin',p);
+    state.textContent=p?'音乐正在播放中·······':'点击播放音乐';
+  }
+  function toggleMusic(){
+    if(document.body.classList.contains('edit')) return;
+    if(playing){ userPaused=true; bgm.pause(); setPlaying(false); return; }
+    userPaused=false;
+    bgm.play().then(function(){ setPlaying(true); }).catch(function(){
+      setPlaying(false);
+      if(!hasMusic || bgm.error || bgm.networkState===HTMLMediaElement.NETWORK_NO_SOURCE){
+        hasMusic=false;
+        toast('把歌曲文件命名为 music.mp3 放入本文件夹即可播放');
+      }else{
+        toast('点击播放失败，请再试一次');
+      }
+    });
+  }
+  card.addEventListener('click',toggleMusic);
+  fab.addEventListener('click',toggleMusic);
+
+  /* 渐显（缩放布局下 IntersectionObserver 不可靠，直接全部显示） */
+  document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('on');});
+
+  /* Toast */
+  var toastEl=document.getElementById('toast'),tt=null;
+  function toast(m){ toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('show');},2200); }
+
+  /* 留言 */
+  var STORE='hlq_wishes_v1';
+  function loadW(){try{return JSON.parse(localStorage.getItem(STORE))||[];}catch(e){return[];}}
+  function saveW(l){try{localStorage.setItem(STORE,JSON.stringify(l));}catch(e){}}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function renderW(){
+    var l=loadW(),sl=document.getElementById('sheet-list'),b=document.getElementById('wish-count');
+    if(!l.length){
+      sl.innerHTML='<div class="wish-empty">还没有留言，来送上第一份祝福吧～</div>';b.hidden=true;
+    }else{
+      sl.innerHTML=l.map(function(w){return '<div class="wish"><div class="who">'+esc(w.name)+'</div><div class="txt">'+esc(w.text)+'</div></div>';}).join('');
+      b.hidden=false;b.textContent=l.length>99?'99+':l.length;
+    }
+  }
+  renderW();
+  document.getElementById('wish-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var n=document.getElementById('wish-name').value.trim(),t=document.getElementById('wish-text').value.trim();
+    if(!n||!t)return;
+    var l=loadW();l.unshift({name:n,text:t,ts:Date.now()});saveW(l);renderW();
+    document.getElementById('wish-name').value='';document.getElementById('wish-text').value='';
+    toast('祝福已送达 ❤');closeSheet();
+  });
+
+  function openSheet(){document.body.classList.add('sheet-open');}
+  function closeSheet(){document.body.classList.remove('sheet-open');}
+  document.getElementById('dock-wish').addEventListener('click',openSheet);
+  document.getElementById('sheet-mask').addEventListener('click',closeSheet);
+
+  /* 页面随屏宽整体缩放（与原版一致：宽屏下等比放大铺满） */
+  var stage=document.getElementById('stage');
+  var scale=1;
+  function fit(){
+    scale=window.innerWidth/390;
+    stage.style.transform='scale('+scale+')';
+    stage.style.marginBottom=(stage.offsetHeight*(scale-1))+'px';
+  }
+  fit();
+  window.addEventListener('resize',fit);
+  window.addEventListener('orientationchange',fit);
+  window.addEventListener('load',fit);
+  /* 图片异步加载或换图会撑高页面，监听尺寸变化重新计算 */
+  if('ResizeObserver' in window){ new ResizeObserver(fit).observe(stage); }
+
+  /* 点赞 */
+  var LIKE='hlq_likes_v1';
+  var likes=parseInt(localStorage.getItem(LIKE)||'0',10)||0;
+  var lb=document.getElementById('like-count');
+  function renderL(){lb.hidden=likes<=0;lb.textContent=likes>99?'99+':likes;}
+  renderL();
+  document.getElementById('dock-like').addEventListener('click',function(e){
+    likes++;try{localStorage.setItem(LIKE,String(likes));}catch(err){}
+    renderL();
+    var r=e.currentTarget.getBoundingClientRect();
+    for(var i=0;i<3;i++){
+      var h=document.createElement('span');
+      h.className='heart-fly';h.textContent='❤';
+      h.style.left=(r.left+r.width/2-8)+'px';h.style.top=(r.top-4)+'px';
+      h.style.setProperty('--dx',(Math.random()*60-30)+'px');
+      h.style.animationDelay=(i*0.08)+'s';
+      document.body.appendChild(h);
+      (function(el){setTimeout(function(){el.remove();},1200);})(h);
+    }
+  });
+
+  /* 导航 */
+  function navURL(){return 'https://uri.amap.com/search?keyword=%E9%87%91%E5%9F%9F%E5%A9%9A%E7%A4%BC%E5%BA%84%E5%9B%AD&city=%E6%B3%B0%E5%B7%9E&src=invite';}
+  document.getElementById('dock-nav').addEventListener('click',function(){
+    window.open(navURL(),'_blank');
+  });
+  q('.nav-btn').addEventListener('click',function(e){
+    if(document.body.classList.contains('edit')) e.preventDefault();
+  });
+
+  /* 分享 */
+  document.getElementById('dock-share').addEventListener('click',function(){
+    var url=location.href;
+    function done(){toast('链接已复制，快分享给好友吧');}
+    function fb(){
+      var ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');done();}catch(e){toast('请手动复制地址栏链接');}
+      ta.remove();
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done).catch(fb);}else fb();
+  });
+
+  /* ============ 编辑模式 ============ */
+  var isLocal=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var canEdit=isLocal || /[?&]edit=1/.test(location.search);
+  var gear=document.getElementById('edit-gear');
+  if(canEdit) gear.style.display='flex';
+  var editOn=false;
+  function setEdit(on){
+    editOn=on;
+    document.body.classList.toggle('edit',on);
+    document.querySelectorAll('[data-k]').forEach(function(el){ el.contentEditable=on?'true':'false'; });
+    if(!on) toast('改动已自动保存');
+  }
+  gear.addEventListener('click',function(){ setEdit(!editOn); });
+  document.getElementById('edit-done').addEventListener('click',function(){ setEdit(false); });
+  document.getElementById('edit-reset').addEventListener('click',function(){
+    if(confirm('确定恢复全部默认内容？你的文字、图片、位置改动都会被清除')){
+      localStorage.removeItem(CUST_KEY); location.reload();
+    }
+  });
+  document.getElementById('font-sel').addEventListener('change',function(){
+    cust.font=this.value; saveCust(); applyFont();
+  });
+  applyFont();
+
+  /* 文字编辑：输入即保存 */
+  document.addEventListener('input',function(e){
+    if(!editOn) return;
+    var el=e.target.closest&&e.target.closest('[data-k]');
+    if(!el) return;
+    cust.texts[el.dataset.k]=el.innerHTML; saveCust();
+  });
+
+  /* 图片替换（压缩后保存，防止超出存储） */
+  var picker=document.getElementById('img-picker'), imgTarget=null;
+  function pickImage(img){ imgTarget=img; picker.value=''; picker.click(); }
+  picker.addEventListener('change',function(){
+    var f=picker.files&&picker.files[0];
+    if(!f||!imgTarget) return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var maxW=1000, w=im.width, h=im.height;
+        if(w>maxW){ h=Math.round(h*maxW/w); w=maxW; }
+        var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(im,0,0,w,h);
+        var keepPng=/png|gif|webp/i.test(f.type);
+        var url=cv.toDataURL(keepPng?'image/png':'image/jpeg',0.85);
+        imgTarget.src=url;
+        cust.imgs[imgTarget.dataset.img]=url; saveCust();
+        toast('图片已更换');
+      };
+      im.src=rd.result;
+    };
+    rd.readAsDataURL(f);
+  });
+
+  /* 版块拖动 + 点击图片 */
+  var dragEl=null,sx=0,sy=0,ox=0,oy=0,lx=0,ly=0,moved=false;
+  stage.addEventListener('pointerdown',function(e){
+    if(!editOn) return;
+    var b=e.target;
+    while(b&&b.parentNode!==stage) b=b.parentNode;
+    if(!b||!b.dataset||b.dataset.b===undefined) return;
+    dragEl=b; moved=false;
+    sx=e.clientX; sy=e.clientY;
+    var p=cust.pos[b.dataset.b]||{x:0,y:0};
+    ox=p.x; oy=p.y; lx=ox; ly=oy;
+  });
+  document.addEventListener('pointermove',function(e){
+    if(!dragEl) return;
+    var dx=(e.clientX-sx)/scale, dy=(e.clientY-sy)/scale;
+    if(Math.abs(dx)+Math.abs(dy)>5) moved=true;
+    if(moved){ lx=ox+dx; ly=oy+dy; dragEl.style.transform='translate('+lx+'px,'+ly+'px)'; }
+  });
+  document.addEventListener('pointerup',function(e){
+    if(!dragEl) return;
+    if(moved){
+      cust.pos[dragEl.dataset.b]={x:Math.round(lx),y:Math.round(ly)}; saveCust();
+    }else{
+      var img=e.target.closest&&e.target.closest('img[data-img]');
+      if(img&&editOn) pickImage(img);
+    }
+    dragEl=null;
+  });
+
+  /* 导出成品：下载当前定制后的完整页面 */
+  document.getElementById('edit-export').addEventListener('click',function(){
+    setEdit(false);
+    var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='wedding-invite.html';
+    a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+    toast('已导出，把这个文件发给我就能更新线上版本');
+  });
+})();
+</script>
+</body>
+</html>
