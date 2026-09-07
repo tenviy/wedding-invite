@@ -793,26 +793,37 @@
   var toastEl=document.getElementById('toast'),tt=null;
   function toast(m){ toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('show');},2200); }
 
-  /* 留言 */
-  var STORE='hlq_wishes_v1';
-  function loadW(){try{return JSON.parse(localStorage.getItem(STORE))||[];}catch(e){return[];}}
-  function saveW(l){try{localStorage.setItem(STORE,JSON.stringify(l));}catch(e){}}
+  /* 浏览统计（编辑模式不计） */
+  if(!/[?&]edit=1/.test(location.search)&&location.protocol.indexOf('http')===0){
+    fetch('/api/track',{method:'POST'}).catch(function(){});
+  }
+
+  /* 留言（服务器留存，所有访客可见） */
+  var wishes=[];
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function renderW(){
-    var l=loadW(),sl=document.getElementById('sheet-list'),b=document.getElementById('wish-count');
-    if(!l.length){
+    var sl=document.getElementById('sheet-list'),b=document.getElementById('wish-count');
+    if(!wishes.length){
       sl.innerHTML='<div class="wish-empty">还没有留言，来送上第一份祝福吧～</div>';b.hidden=true;
     }else{
-      sl.innerHTML=l.map(function(w){return '<div class="wish"><div class="who">'+esc(w.name)+'</div><div class="txt">'+esc(w.text)+'</div></div>';}).join('');
-      b.hidden=false;b.textContent=l.length>99?'99+':l.length;
+      sl.innerHTML=wishes.map(function(w){return '<div class="wish"><div class="who">'+esc(w.name)+'</div><div class="txt">'+esc(w.text)+'</div></div>';}).join('');
+      b.hidden=false;b.textContent=wishes.length>99?'99+':wishes.length;
     }
   }
   renderW();
+  if(location.protocol.indexOf('http')===0){
+    fetch('/api/public').then(function(r){return r.json();}).then(function(res){
+      if(res&&res.ok){ wishes=res.wishes||[]; renderW(); likes=res.likes||0; renderL(); }
+    }).catch(function(){});
+  }
   document.getElementById('wish-form').addEventListener('submit',function(e){
     e.preventDefault();
     var n=document.getElementById('wish-name').value.trim(),t=document.getElementById('wish-text').value.trim();
     if(!n||!t)return;
-    var l=loadW();l.unshift({name:n,text:t,ts:Date.now()});saveW(l);renderW();
+    fetch('/api/wish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,text:t})})
+      .then(function(r){return r.json();}).then(function(res){
+        if(res&&res.ok){ wishes.unshift(res.wish); renderW(); }
+      }).catch(function(){ toast('网络不佳，祝福可能没存上，稍后再试试'); });
     document.getElementById('wish-name').value='';document.getElementById('wish-text').value='';
     toast('祝福已送达 ❤');closeSheet();
   });
@@ -837,15 +848,22 @@
   /* 图片异步加载或换图会撑高页面，监听尺寸变化重新计算 */
   if('ResizeObserver' in window){ new ResizeObserver(fit).observe(stage); }
 
-  /* 点赞 */
-  var LIKE='hlq_likes_v1';
-  var likes=parseInt(localStorage.getItem(LIKE)||'0',10)||0;
+  /* 点赞（服务器计数，本机记住是否已点） */
+  var likes=0, liked=false;
+  try{liked=localStorage.getItem('hlq_liked_v1')==='1';}catch(e){}
   var lb=document.getElementById('like-count');
   function renderL(){lb.hidden=likes<=0;lb.textContent=likes>99?'99+':likes;}
   renderL();
   document.getElementById('dock-like').addEventListener('click',function(e){
-    likes++;try{localStorage.setItem(LIKE,String(likes));}catch(err){}
+    liked=!liked;
+    likes=Math.max(0,likes+(liked?1:-1));
+    try{localStorage.setItem('hlq_liked_v1',liked?'1':'0');}catch(err){}
     renderL();
+    if(location.protocol.indexOf('http')===0){
+      fetch('/api/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({delta:liked?1:-1})})
+        .then(function(r){return r.json();}).then(function(res){ if(res&&res.ok){ likes=res.likes; renderL(); } })
+        .catch(function(){});
+    }
     var r=e.currentTarget.getBoundingClientRect();
     for(var i=0;i<3;i++){
       var h=document.createElement('span');
