@@ -132,7 +132,7 @@
   .calendar .cal-month{margin:0 auto}
   .calendar .cal-month .en{font-family:"Great Vibes",cursive;color:var(--red);font-size:36px;display:block}
   .calendar .cal-month .cn{display:block;font-size:13.5px;letter-spacing:.32em;color:var(--ink-soft);margin-top:6px}
-  .calendar table{width:100%;border-collapse:collapse;margin-top:26px}
+  .calendar table{width:100%;border-collapse:collapse;margin-top:26px;table-layout:fixed}
   .calendar th{font-family:Georgia,serif;font-weight:400;color:#9a9a9a;font-size:12.5px;letter-spacing:.06em;padding:8px 0}
   .calendar td{color:var(--tan);font-size:15px;padding:12px 0;font-family:var(--serif)}
   .calendar td .heart{
@@ -143,11 +143,17 @@
   .calendar td .heart b{position:relative;color:#fff;font-weight:600;font-size:14px;padding-bottom:3px}
 
   /* 地址 */
-  .addr-lines{padding:18px 30px 0;text-align:left;font-size:15.5px;line-height:2.3}
+  .addr-lines{
+    margin:22px 30px 0;padding:18px 16px;text-align:center;
+    background:rgba(255,253,247,.85);border:1px solid rgba(179,58,48,.5);border-radius:14px;
+    font-size:16.5px;font-weight:600;line-height:2.1;letter-spacing:.04em;
+    box-shadow:0 8px 22px rgba(90,60,40,.10);
+  }
   .nav-btn{
-    display:inline-block;margin:20px 30px 0;background:#e0301e;color:#fff;
-    font-size:14px;font-weight:600;letter-spacing:.2em;padding:9px 26px;border-radius:8px;
+    display:block;margin:16px 30px 0;background:#e0301e;color:#fff;text-align:center;
+    font-size:15.5px;font-weight:600;letter-spacing:.34em;text-indent:.34em;padding:14px 0;border-radius:12px;
     text-decoration:none;border:none;cursor:pointer;font-family:var(--serif);
+    box-shadow:0 6px 16px rgba(224,48,30,.28);
   }
 
   /* 着装 */
