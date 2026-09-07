@@ -440,7 +440,7 @@
   </div>
   <div class="time-lines reveal" data-k="time-lines" data-b="25" contenteditable="false">
     · 2026/09.19 ▏农历八月初九<br>
-    · 星期六 ▏18时00分
+    · 星期六 ▏18时08分
   </div>
 
   <!-- 流程 -->
@@ -449,19 +449,19 @@
       <span class="lab" data-k="lab1" contenteditable="false">宾客到场</span>
       <img class="ico-img" src="photos/icon-arrive.png" alt="" data-img="icon-arrive">
       <span class="dots"></span>
-      <span class="desc" data-k="d1" contenteditable="false"><b>18:00PM</b>见面是快乐的偏方</span>
+      <span class="desc" data-k="d1" contenteditable="false"><b>18:08PM</b>见面是快乐的偏方</span>
     </div>
     <div class="row">
       <span class="lab" data-k="lab2" contenteditable="false">婚礼仪式</span>
       <img class="ico-img" src="photos/icon-ceremony.png" alt="" data-img="icon-ceremony">
       <span class="dots"></span>
-      <span class="desc" data-k="d2" contenteditable="false"><b>18:30PM</b>好兄弟拜把子仪式</span>
+      <span class="desc" data-k="d2" contenteditable="false"><b>18:38PM</b>好兄弟拜把子仪式</span>
     </div>
     <div class="row">
-      <span class="lab" data-k="lab3" contenteditable="false">婚礼晚宴</span>
+      <span class="lab" data-k="lab3" contenteditable="false">晚宴开席</span>
       <img class="ico-img" src="photos/icon-dinner.png" alt="" data-img="icon-dinner">
       <span class="dots"></span>
-      <span class="desc" data-k="d3" contenteditable="false"><b>19:00PM</b>撸起袖子加油搂席</span>
+      <span class="desc" data-k="d3" contenteditable="false"><b>18:58PM</b>撸起袖子加油搂席</span>
     </div>
   </div>
 
@@ -480,7 +480,7 @@
     <div class="cn" data-k="addr-cn" contenteditable="false">婚礼地址</div>
   </div>
   <div class="addr-lines reveal" data-k="addr-lines" data-b="29" contenteditable="false">
-    · 金域婚礼庄园（维景酒店北侧）<br>
+    · 金域婚礼庄园 · 罗马厅（维景酒店北侧）<br>
     · 海陵区泰和路与凤凰东路交叉口西北220米
   </div>
   <div class="reveal" data-b="30">
@@ -708,37 +708,40 @@
   var fab=document.getElementById('music-fab');
   var state=document.getElementById('music-state');
   var hasMusic=true, playing=false, userPaused=false;
-  bgm.addEventListener('error',function(){ hasMusic=false; state.textContent='点击播放音乐'; });
-  /* 主动探测 music.mp3 是否存在（preload=none 时 error 事件未必触发） */
-  /* 尽早注册播放触发：微信桥接事件可能在任何时刻触发，不能等网络请求 */
-  function wxKick(){
-    if(typeof WeixinJSBridge!=='undefined'&&WeixinJSBridge.invoke){
-      WeixinJSBridge.invoke('getNetworkType',{},function(){ kick(); });
-    }
-    kick();
-  }
-  document.addEventListener('WeixinJSBridgeReady',wxKick,false);
-  document.addEventListener('touchstart',kick);
-  document.addEventListener('click',kick);
-  if(typeof WeixinJSBridge!=='undefined'){ wxKick(); }
-  fetch('music.mp3',{method:'HEAD'}).then(function(r){
-    if(!r.ok){ hasMusic=false; return; }
-    /* 进页面默认自动播放；被浏览器拦截则靠上面的微信桥接/首次触摸兜底 */
-    bgm.play().then(function(){ setPlaying(true); }).catch(function(){});
-    wxKick();
-  }).catch(function(){ hasMusic=false; });
-  function kick(e){
-    if(playing||!hasMusic||userPaused) return;
-    if(document.body.classList.contains('edit')) return;
-    if(e && e.target && e.target.closest && e.target.closest('#music-card,#music-fab')) return;
-    bgm.play().then(function(){ setPlaying(true); }).catch(function(){});
-  }
+  var DEBUG=/[?&]debug=1/.test(location.search);
+  function beacon(m){ if(!DEBUG) return; try{ (new Image()).src='favicon.ico?dbg='+encodeURIComponent(m)+'&_='+Date.now(); }catch(e){} }
+  beacon('init');
+  bgm.addEventListener('error',function(){ hasMusic=false; state.textContent='点击播放音乐'; beacon('audio-error'); });
   function setPlaying(p){
     playing=p;
     card.classList.toggle('playing',p);
     fab.classList.toggle('spin',p);
     state.textContent=p?'音乐正在播放中·······':'点击播放音乐';
   }
+  function kick(e){
+    if(!hasMusic||userPaused) return;
+    if(document.body.classList.contains('edit')) return;
+    if(e && e.target && e.target.closest && e.target.closest('#music-card,#music-fab')) return;
+    if(playing){ if(bgm.muted){ bgm.muted=false; beacon('late-unmute'); } return; }
+    bgm.muted=false;
+    bgm.play().then(function(){ setPlaying(true); beacon('play-ok'); })
+      .catch(function(err){ beacon('play-fail-'+(err&&err.name)); });
+  }
+  function wxKick(){
+    if(typeof WeixinJSBridge!=='undefined'&&WeixinJSBridge.invoke){
+      WeixinJSBridge.invoke('getNetworkType',{},function(){ beacon('bridge-invoke'); kick(); });
+    }
+    kick();
+  }
+  document.addEventListener('WeixinJSBridgeReady',function(){ beacon('bridge-ready'); wxKick(); },false);
+  document.addEventListener('touchstart',function(){ kick(); },{passive:true});
+  document.addEventListener('click',kick);
+  if(typeof WeixinJSBridge!=='undefined'){ beacon('bridge-exists'); wxKick(); }
+  fetch('music.mp3',{method:'HEAD'}).then(function(r){
+    if(!r.ok){ hasMusic=false; return; }
+    kick();
+    wxKick();
+  }).catch(function(){ hasMusic=false; beacon('head-fail'); });
   function toggleMusic(){
     if(document.body.classList.contains('edit')) return;
     if(playing){ userPaused=true; bgm.pause(); setPlaying(false); return; }
