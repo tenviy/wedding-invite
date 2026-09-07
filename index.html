@@ -523,7 +523,7 @@
 <!-- 编辑入口（本地或网址带 ?edit=1 时显示） -->
 <button class="edit-gear" id="edit-gear" title="编辑页面">✎</button>
 <div class="edit-bar" id="edit-bar">
-  <span class="tip">编辑模式：点文字直接改 · 点图片换图 · 按住版块拖动位置 · 改动自动保存</span>
+  <span class="tip">编辑模式：点文字直接改 · 点图片换图 · 按住版块拖动位置 · 改动自动保存并实时上线</span>
   <select id="font-sel" title="更换字体">
     <option value="">字体：宋体（默认）</option>
     <option value="kai">楷体</option>
@@ -623,22 +623,53 @@
   function saveCust(){
     try{localStorage.setItem(CUST_KEY,JSON.stringify(cust));}
     catch(e){ toast('图片过大，存储空间不足，请换小一点的图'); }
+    cloudSave();
   }
   function q(sel){return document.querySelector(sel);}
 
   /* 应用已保存的自定义内容 */
-  Object.keys(cust.texts).forEach(function(k){
-    var el=q('[data-k="'+k+'"]'); if(el) el.innerHTML=cust.texts[k];
-  });
-  Object.keys(cust.imgs).forEach(function(k){
-    var el=q('[data-img="'+k+'"]'); if(el) el.src=cust.imgs[k];
-  });
-  var blocks=[].slice.call(q('#stage').children);
-  blocks.forEach(function(el,i){
-    el.dataset.b=i;
-    var p=cust.pos[i];
-    if(p&&(p.x||p.y)) el.style.transform='translate('+p.x+'px,'+p.y+'px)';
-  });
+  function applyCust(){
+    Object.keys(cust.texts).forEach(function(k){
+      var el=q('[data-k="'+k+'"]'); if(el) el.innerHTML=cust.texts[k];
+    });
+    Object.keys(cust.imgs).forEach(function(k){
+      var el=q('[data-img="'+k+'"]'); if(el) el.src=cust.imgs[k];
+    });
+    var blocks=[].slice.call(q('#stage').children);
+    blocks.forEach(function(el,i){
+      el.dataset.b=i;
+      var p=cust.pos[i];
+      if(p&&(p.x||p.y)) el.style.transform='translate('+p.x+'px,'+p.y+'px)';
+    });
+  }
+  applyCust();
+
+  /* 云端同步：所有访客实时加载服务器上保存的内容 */
+  var editKey=(location.search.match(/[?&]key=([^&]+)/)||[])[1]||'';
+  if(editKey){ try{localStorage.setItem('hlq_edit_key',decodeURIComponent(editKey));}catch(e){} }
+  else{ try{editKey=localStorage.getItem('hlq_edit_key')||'';}catch(e){editKey='';} }
+  function normCust(c){ c=c||{}; c.texts=c.texts||{}; c.imgs=c.imgs||{}; c.pos=c.pos||{}; c.crop=c.crop||{}; return c; }
+  if(location.protocol.indexOf('http')===0){
+    fetch('custom.json?_='+Date.now()).then(function(r){return r.ok?r.json():null;}).then(function(sc){
+      if(!sc){ document.documentElement.setAttribute('data-cloud','empty'); return; }
+      cust=normCust(sc);
+      try{localStorage.setItem(CUST_KEY,JSON.stringify(cust));}catch(e){}
+      applyCust(); applyCrops(); applyFont();
+      document.documentElement.setAttribute('data-cloud','applied:'+Object.keys(cust.imgs).length);
+    }).catch(function(e){ document.documentElement.setAttribute('data-cloud','fail:'+String(e).slice(0,80)); });
+  }
+  /* 编辑时实时保存到服务器，立即对所有人生效 */
+  var cloudTimer=null, cloudFailNoted=false;
+  function cloudSave(){
+    if(!editKey||location.protocol.indexOf('http')!==0) return;
+    clearTimeout(cloudTimer);
+    cloudTimer=setTimeout(function(){
+      fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:editKey,cust:cust})})
+        .then(function(r){return r.json();})
+        .then(function(res){ if(res&&res.ok){ cloudFailNoted=false; }else{ throw 0; } })
+        .catch(function(){ if(!cloudFailNoted){ cloudFailNoted=true; toast('云端同步失败，改动暂时只保存在本机'); } });
+    },800);
+  }
 
   /* 字体 */
   var FONTS={
@@ -682,10 +713,16 @@
   fetch('music.mp3',{method:'HEAD'}).then(function(r){
     if(!r.ok){ hasMusic=false; return; }
     /* 有音乐文件：进页面默认自动播放；被浏览器拦截则在首次触摸/点击时自动开始 */
-    bgm.play().then(function(){ setPlaying(true); }).catch(function(){
-      document.addEventListener('touchstart',kick);
-      document.addEventListener('click',kick);
-    });
+    bgm.play().then(function(){ setPlaying(true); }).catch(function(){});
+    /* 微信内置浏览器：桥接就绪事件触发后无需手势即可播放（婚礼乎同款方案） */
+    document.addEventListener('WeixinJSBridgeReady',function(){
+      if(typeof WeixinJSBridge!=='undefined'&&WeixinJSBridge.invoke){ WeixinJSBridge.invoke('getNetworkType',{},function(){ kick(); }); }
+      kick();
+    },false);
+    document.addEventListener('touchstart',kick);
+    document.addEventListener('click',kick);
+    /* 若桥接已就绪（事件先于本脚本触发），直接尝试播放 */
+    if(typeof WeixinJSBridge!=='undefined'){ kick(); }
   }).catch(function(){ hasMusic=false; });
   function kick(e){
     if(playing||!hasMusic||userPaused) return;
@@ -847,13 +884,16 @@
     editOn=on;
     document.body.classList.toggle('edit',on);
     document.querySelectorAll('[data-k]').forEach(function(el){ el.contentEditable=on?'true':'false'; });
-    if(!on) toast('改动已自动保存');
+    if(!on) toast(editKey?'改动已自动保存并同步上线':'改动已自动保存');
   }
   gear.addEventListener('click',function(){ setEdit(!editOn); });
   document.getElementById('edit-done').addEventListener('click',function(){ setEdit(false); });
   document.getElementById('edit-reset').addEventListener('click',function(){
     if(confirm('确定恢复全部默认内容？你的文字、图片、位置改动都会被清除')){
-      localStorage.removeItem(CUST_KEY); location.reload();
+      localStorage.removeItem(CUST_KEY);
+      if(editKey&&location.protocol.indexOf('http')===0){
+        fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:editKey,cust:{},reset:true})}).finally(function(){ location.reload(); });
+      }else location.reload();
     }
   });
   document.getElementById('font-sel').addEventListener('change',function(){
@@ -917,12 +957,15 @@
     img.style.transform='translate('+(c.x||0)+'%,'+(c.y||0)+'%) scale('+(c.s||1)+')';
   }
   /* 加载时恢复已保存的裁剪 */
-  Object.keys(cust.crop).forEach(function(k){
-    var img=q('[data-img="'+k+'"]'); if(!img) return;
-    var wrap=wrapCrop(img);
-    if(cust.crop[k].ar) wrap.style.aspectRatio=cust.crop[k].ar;
-    applyCropStyle(img);
-  });
+  function applyCrops(){
+    Object.keys(cust.crop).forEach(function(k){
+      var img=q('[data-img="'+k+'"]'); if(!img) return;
+      var wrap=wrapCrop(img);
+      if(cust.crop[k].ar) wrap.style.aspectRatio=cust.crop[k].ar;
+      applyCropStyle(img);
+    });
+  }
+  applyCrops();
   function enterAdjust(img){
     if(!editOn) return;
     exitAdjust();
@@ -1033,7 +1076,7 @@
     a.download='wedding-invite.html';
     a.click();
     setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
-    toast('已导出，把这个文件发给我就能更新线上版本');
+    toast('已导出备份文件（改动其实已自动上线，无需导出）');
   });
 })();
 </script>
