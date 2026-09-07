@@ -293,6 +293,31 @@
   body.edit .page>div{cursor:grab;touch-action:none}
   body.edit .page>div:active{cursor:grabbing}
   body.edit .music-card,body.edit .nav-btn{pointer-events:auto}
+
+  /* 图片裁剪/位置调整 */
+  .crop-wrap{position:relative;overflow:hidden;display:block}
+  .crop-wrap>img.crop-img{width:100%!important;height:100%!important;margin:0!important;object-fit:cover;display:block}
+  .pair>.crop-wrap{width:50%}
+  .pair>.crop-wrap:nth-child(2){margin-top:34px}
+  .collage>.crop-wrap.l{width:47%}
+  .collage>.crop-wrap.r{width:53%}
+  .couple .person .crop-wrap{width:132px;height:132px;border-radius:50%;box-shadow:0 6px 22px rgba(100,80,50,.16)}
+  .music-card .crop-wrap{width:52px;height:52px;border-radius:8px;flex:none}
+  .crop-wrap.crop-active{outline:2.5px solid var(--red);outline-offset:2px}
+  .adj-bar{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:calc(126px + env(safe-area-inset-bottom));z-index:67;
+    display:none;align-items:center;gap:10px;
+    background:rgba(51,51,51,.93);color:#f6f2e9;border-radius:16px;
+    padding:10px 16px;font-size:12px;letter-spacing:.05em;max-width:calc(100vw - 20px);
+  }
+  body.adjusting .adj-bar{display:flex}
+  .adj-bar input[type=range]{width:110px;accent-color:#b33a30}
+  .adj-bar button{
+    font-family:var(--serif);font-size:12px;border-radius:999px;
+    border:1px solid rgba(246,242,233,.4);background:transparent;color:#f6f2e9;
+    padding:5px 12px;cursor:pointer;
+  }
 </style>
 </head>
 <body class="">
@@ -495,7 +520,7 @@
 </button>
 
 <!-- 编辑入口（本地或网址带 ?edit=1 时显示） -->
-<button class="edit-gear" id="edit-gear" title="编辑页面" style="display: flex;">✎</button>
+<button class="edit-gear" id="edit-gear" title="编辑页面">✎</button>
 <div class="edit-bar" id="edit-bar">
   <span class="tip">编辑模式：点文字直接改 · 点图片换图 · 按住版块拖动位置 · 改动自动保存</span>
   <select id="font-sel" title="更换字体">
@@ -504,9 +529,16 @@
     <option value="hei">黑体</option>
     <option value="yuan">圆体</option>
   </select>
+  <button id="edit-crop">调图片</button>
   <button id="edit-export">导出成品</button>
   <button id="edit-reset">恢复默认</button>
   <button id="edit-done">完成</button>
+</div>
+<div class="adj-bar" id="adj-bar">
+  <span>拖动图片调位置 · 滚轮或滑杆缩放</span>
+  <input type="range" id="adj-zoom" min="0.5" max="3" step="0.01" value="1">
+  <button id="adj-reset">重置</button>
+  <button id="adj-done">完成</button>
 </div>
 <input type="file" id="img-picker" accept="image/*" hidden="">
 
@@ -854,17 +886,114 @@
         var url=cv.toDataURL(keepPng?'image/png':'image/jpeg',0.85);
         imgTarget.src=url;
         cust.imgs[imgTarget.dataset.img]=url; saveCust();
-        toast('图片已更换');
+        toast('图片已更换，可直接拖动调整位置');
+        enterAdjust(imgTarget);
       };
       im.src=rd.result;
     };
     rd.readAsDataURL(f);
   });
 
+  /* 图片裁剪/位置调整 */
+  var adjImg=null, adjDrag=null, cropArm=false;
+  var adjZoom=document.getElementById('adj-zoom');
+  cust.crop=cust.crop||{};
+
+  function wrapCrop(img){
+    var p=img.parentNode;
+    if(p&&p.classList&&p.classList.contains('crop-wrap')) return p;
+    var r=img.getBoundingClientRect();
+    var wrap=document.createElement('div');
+    wrap.className=('crop-wrap '+img.className).trim();
+    if(r.width&&r.height) wrap.style.aspectRatio=String(r.width/r.height);
+    p.insertBefore(wrap,img);
+    img.className='crop-img';
+    wrap.appendChild(img);
+    return wrap;
+  }
+  function applyCropStyle(img){
+    var c=cust.crop[img.dataset.img]; if(!c) return;
+    img.style.transform='translate('+(c.x||0)+'%,'+(c.y||0)+'%) scale('+(c.s||1)+')';
+  }
+  /* 加载时恢复已保存的裁剪 */
+  Object.keys(cust.crop).forEach(function(k){
+    var img=q('[data-img="'+k+'"]'); if(!img) return;
+    var wrap=wrapCrop(img);
+    if(cust.crop[k].ar) wrap.style.aspectRatio=cust.crop[k].ar;
+    applyCropStyle(img);
+  });
+  function enterAdjust(img){
+    if(!editOn) return;
+    exitAdjust();
+    var wrap=wrapCrop(img);
+    var k=img.dataset.img;
+    cust.crop[k]=cust.crop[k]||{s:1,x:0,y:0};
+    cust.crop[k].ar=wrap.style.aspectRatio||1;
+    adjImg=img; wrap.classList.add('crop-active');
+    document.body.classList.add('adjusting');
+    adjZoom.value=cust.crop[k].s||1;
+    toast('拖动图片调位置，滑杆/滚轮缩放，点空白处退出');
+  }
+  function exitAdjust(){
+    if(adjImg){ adjImg.parentNode.classList.remove('crop-active'); adjImg=null; }
+    document.body.classList.remove('adjusting');
+    adjDrag=null;
+  }
+  document.addEventListener('dblclick',function(e){
+    if(!editOn) return;
+    var img=e.target.closest&&e.target.closest('img[data-img]');
+    if(img){ e.preventDefault(); enterAdjust(img); }
+  });
+  document.getElementById('edit-crop').addEventListener('click',function(){
+    cropArm=true; toast('点一张图片进入调整');
+  });
+  adjZoom.addEventListener('input',function(){
+    if(!adjImg) return;
+    cust.crop[adjImg.dataset.img].s=parseFloat(this.value);
+    applyCropStyle(adjImg); saveCust();
+  });
+  document.getElementById('adj-reset').addEventListener('click',function(){
+    if(!adjImg) return;
+    var k=adjImg.dataset.img;
+    cust.crop[k]={s:1,x:0,y:0,ar:cust.crop[k].ar};
+    adjZoom.value=1; applyCropStyle(adjImg); saveCust();
+  });
+  document.getElementById('adj-done').addEventListener('click',exitAdjust);
+  /* 调整模式：拖动平移 / 滚轮缩放 */
+  document.addEventListener('pointerdown',function(e){
+    if(!adjImg) return;
+    if(e.target.closest&&e.target.closest('.adj-bar')) return;
+    var wrap=adjImg.parentNode;
+    if(!(e.target.closest&&e.target.closest('.crop-wrap')===wrap)){ exitAdjust(); return; }
+    var c=cust.crop[adjImg.dataset.img];
+    adjDrag={sx:e.clientX,sy:e.clientY,ox:c.x||0,oy:c.y||0};
+    e.preventDefault();
+  },true);
+  document.addEventListener('pointermove',function(e){
+    if(!adjDrag||!adjImg) return;
+    var r=adjImg.parentNode.getBoundingClientRect();
+    var c=cust.crop[adjImg.dataset.img];
+    c.x=adjDrag.ox+(e.clientX-adjDrag.sx)/r.width*100;
+    c.y=adjDrag.oy+(e.clientY-adjDrag.sy)/r.height*100;
+    applyCropStyle(adjImg);
+  },true);
+  document.addEventListener('pointerup',function(){
+    if(adjDrag){ adjDrag=null; saveCust(); }
+  },true);
+  document.addEventListener('wheel',function(e){
+    if(!adjImg) return;
+    var wrap=adjImg.parentNode;
+    if(!(e.target.closest&&e.target.closest('.crop-wrap')===wrap)) return;
+    e.preventDefault();
+    var c=cust.crop[adjImg.dataset.img];
+    c.s=Math.min(4,Math.max(0.3,(c.s||1)*(e.deltaY<0?1.08:0.92)));
+    adjZoom.value=c.s; applyCropStyle(adjImg); saveCust();
+  },{passive:false});
+
   /* 版块拖动 + 点击图片 */
   var dragEl=null,sx=0,sy=0,ox=0,oy=0,lx=0,ly=0,moved=false;
   stage.addEventListener('pointerdown',function(e){
-    if(!editOn) return;
+    if(!editOn||adjImg) return;
     var b=e.target;
     while(b&&b.parentNode!==stage) b=b.parentNode;
     if(!b||!b.dataset||b.dataset.b===undefined) return;
@@ -885,7 +1014,10 @@
       cust.pos[dragEl.dataset.b]={x:Math.round(lx),y:Math.round(ly)}; saveCust();
     }else{
       var img=e.target.closest&&e.target.closest('img[data-img]');
-      if(img&&editOn) pickImage(img);
+      if(img&&editOn&&!adjImg){
+        if(cropArm){ cropArm=false; enterAdjust(img); }
+        else pickImage(img);
+      }
     }
     dragEl=null;
   });
