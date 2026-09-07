@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head>
+<html lang="zh-CN" prefix="og: https://ogp.me/ns#"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>帅天威 &amp; 沈湘雨的婚礼邀请</title>
@@ -7,11 +7,11 @@
 <meta name="description" content="2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻">
 <meta itemprop="name" content="帅天威 &amp; 沈湘雨的婚礼邀请">
 <meta itemprop="description" content="2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻">
-<meta itemprop="image" content="https://q.52doc.cn/photos/g3.jpg">
+<meta itemprop="image" content="https://q.52doc.cn/photos/share-cover.jpg">
 <meta property="og:type" content="website">
 <meta property="og:title" content="帅天威 &amp; 沈湘雨的婚礼邀请">
 <meta property="og:description" content="2026年9月19日 · 泰州金域婚礼庄园 · 诚邀您见证我们的幸福时刻">
-<meta property="og:image" content="https://q.52doc.cn/photos/g3.jpg">
+<meta property="og:image" content="https://q.52doc.cn/photos/share-cover.jpg">
 <meta property="og:url" content="https://q.52doc.cn/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
@@ -341,7 +341,7 @@
     <div class="eq"><i></i><i></i><i></i><i></i></div>
     <img class="album" src="photos/album.jpg" alt="专辑封面" data-img="album">
   </div>
-  <audio id="bgm" src="music.mp3" loop="" preload="none" data-b="4"></audio>
+  <audio id="bgm" src="music.mp3" loop="" autoplay="" preload="auto" data-b="4"></audio>
 
   <div class="reveal" style="margin-top:26px" data-b="5"><img class="photo" src="photos/g2.jpg" alt="婚纱照" data-img="g2"></div>
 
@@ -387,7 +387,7 @@
   <div class="hand-section hand reveal" data-k="about-title" data-b="11" contenteditable="false">【关于我们】</div>
 
   <!-- 求婚 -->
-  <div class="story-title reveal" data-k="t-propose" data-b="12" contenteditable="false">『2026.12.24·求婚』</div>
+  <div class="story-title reveal" data-k="t-propose" data-b="12" contenteditable="false">『2025.12.24·求婚』</div>
   <div class="text-block left reveal" data-k="tx-propose" data-b="13" contenteditable="false">
     被求婚啦<br>
     他单膝跪地，我笑着说“我愿意”<br>
@@ -710,19 +710,22 @@
   var hasMusic=true, playing=false, userPaused=false;
   bgm.addEventListener('error',function(){ hasMusic=false; state.textContent='点击播放音乐'; });
   /* 主动探测 music.mp3 是否存在（preload=none 时 error 事件未必触发） */
+  /* 尽早注册播放触发：微信桥接事件可能在任何时刻触发，不能等网络请求 */
+  function wxKick(){
+    if(typeof WeixinJSBridge!=='undefined'&&WeixinJSBridge.invoke){
+      WeixinJSBridge.invoke('getNetworkType',{},function(){ kick(); });
+    }
+    kick();
+  }
+  document.addEventListener('WeixinJSBridgeReady',wxKick,false);
+  document.addEventListener('touchstart',kick);
+  document.addEventListener('click',kick);
+  if(typeof WeixinJSBridge!=='undefined'){ wxKick(); }
   fetch('music.mp3',{method:'HEAD'}).then(function(r){
     if(!r.ok){ hasMusic=false; return; }
-    /* 有音乐文件：进页面默认自动播放；被浏览器拦截则在首次触摸/点击时自动开始 */
+    /* 进页面默认自动播放；被浏览器拦截则靠上面的微信桥接/首次触摸兜底 */
     bgm.play().then(function(){ setPlaying(true); }).catch(function(){});
-    /* 微信内置浏览器：桥接就绪事件触发后无需手势即可播放（婚礼乎同款方案） */
-    document.addEventListener('WeixinJSBridgeReady',function(){
-      if(typeof WeixinJSBridge!=='undefined'&&WeixinJSBridge.invoke){ WeixinJSBridge.invoke('getNetworkType',{},function(){ kick(); }); }
-      kick();
-    },false);
-    document.addEventListener('touchstart',kick);
-    document.addEventListener('click',kick);
-    /* 若桥接已就绪（事件先于本脚本触发），直接尝试播放 */
-    if(typeof WeixinJSBridge!=='undefined'){ kick(); }
+    wxKick();
   }).catch(function(){ hasMusic=false; });
   function kick(e){
     if(playing||!hasMusic||userPaused) return;
@@ -755,6 +758,27 @@
 
   /* 渐显（缩放布局下 IntersectionObserver 不可靠，直接全部显示） */
   document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('on');});
+
+  /* 自动缓慢滚动：进页面 2 秒后开始；监听滚动事件本身——程序滚的忽略，用户滚的暂停，停下 2.5 秒后恢复 */
+  (function(){
+    var autoOn=false, resumeT=null, lastProg=0;
+    setInterval(function(){
+      if(!autoOn) return;
+      if(document.body.classList.contains('edit')) return;
+      lastProg=Date.now();
+      window.scrollBy(0,1);
+    },18);
+    function pause(){
+      autoOn=false;
+      clearTimeout(resumeT);
+      resumeT=setTimeout(function(){ autoOn=true; },2500);
+    }
+    window.addEventListener('scroll',function(){
+      if(Date.now()-lastProg<150) return;
+      pause();
+    },{passive:true});
+    setTimeout(function(){ autoOn=true; },2000);
+  })();
 
   /* Toast */
   var toastEl=document.getElementById('toast'),tt=null;
